@@ -46,6 +46,17 @@ export function Home() {
 						className="form-control"
 						previewStep={true}
 						publicKey={"84a750524a2ee4b61059"}
+						validators={[
+							fileInfo => {
+								console.log("Some validation", fileInfo);
+								if (fileInfo.size > 400000) {
+									alert("File cannot be bigger than 400kb");
+									throw new Error(
+										"File cannot be bigger than 400kb"
+									);
+								}
+							}
+						]}
 						onFileSelect={file => {
 							console.log("File changed: ", file);
 
