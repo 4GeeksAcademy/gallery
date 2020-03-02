@@ -25,10 +25,10 @@ export function Home() {
 			.then(resp => resp.json())
 			.then(data => setImages(data))
 			.catch(err => console.error(err));
-	}
+	};
 
 	useEffect(() => {
-
+		getImages();
 	}, []);
 	return (
 		<div className="container">
@@ -69,79 +69,64 @@ export function Home() {
 				</div>
 			) : null}
 			<div className="gallery card-columns">
-				{images
-					.filter(i => {
-						if (filterCategories.length > 0) {
-							if (
-								filterCategories
-									.map(c => c.value || c)
-									.includes(i.category)
-							)
-								return true;
-							else return false;
-						}
-						return true;
-					})
-					.map(img => (
-						<div key={img.uuid} className="card">
-							<div
-								className="card-img-top w-100"
-								style={{
-									backgroundImage: `url('${img.url}')`,
-									height: "250px"
-								}}>
-								<ul className="icons">
-									<li
-										className="pointer"
-										onClick={e => {
-											const _delete = window.confirm(
-												"Are you sure you want to delete this image"
-											);
-											if (_delete)
-												fetch(
-													process.env.ASSETS_URL +
-														"apis/static/image/" +
-														img.uuid,
-													{
-														method: "DELETE"
-													}
-												)
-													.then(resp => {
-														if (resp.status === 200)
-															setImages(
-																images.filter(
-																	i =>
-																		i.uuid !==
-																		img.uuid
-																)
-															);
-														return resp.json();
-													})
-													.catch(
-														err =>
-															console.error(
-																err
-															) ||
-															alert(
-																"There was an error deleting the image"
+				{images.length === 0 && <p>No files found</p>}
+				{images.map(img => (
+					<div key={img.uuid} className="card">
+						<div
+							className="card-img-top w-100"
+							style={{
+								backgroundImage: `url('${img.url}')`,
+								height: "250px"
+							}}>
+							<ul className="icons">
+								<li
+									className="pointer"
+									onClick={e => {
+										const _delete = window.confirm(
+											"Are you sure you want to delete this image"
+										);
+										if (_delete)
+											fetch(
+												"api/delete.js?uuid=" +
+													img.uuid,
+												{
+													method: "POST"
+												}
+											)
+												.then(resp => {
+													if (resp.status === 200)
+														setImages(
+															images.filter(
+																i =>
+																	i.uuid !==
+																	img.uuid
 															)
-													);
-										}}>
-										<i className="fas fa-trash" />
-									</li>
-									<li
-										className="pointer"
-										onClick={e => window.open(img.url)}>
-										<i className="fas fa-external-link-alt" />
-									</li>
-								</ul>
-							</div>
-							<div className="card-block p-2">
-								<p className="card-text">{img.description}</p>
-								<h5 className="card-title">{img.category}</h5>
-							</div>
+														);
+													return resp.json();
+												})
+												.catch(
+													err =>
+														console.error(err) ||
+														alert(
+															"There was an error deleting the image"
+														)
+												);
+									}}>
+									<i className="fas fa-trash" />
+								</li>
+								<li
+									className="pointer"
+									onClick={e => window.open(img.url)}>
+									<i className="fas fa-external-link-alt" />
+								</li>
+							</ul>
 						</div>
-					))}
+						<div className="card-block p-2">
+							<p className="card-text">{img.description}</p>
+							<h5 className="card-title">{img.category}</h5>
+						</div>
+					</div>
+				))}
 			</div>
 		</div>
 	);

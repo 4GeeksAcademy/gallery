@@ -12,7 +12,8 @@ module.exports = (req, res) => {
         else{
             const images = data.results.map(i => {
                 return {
-                    url: i.url,
+                    ...i,
+                    url: i.original_file_url,
                     uuid: i.uuid,
                     description: "no description",
                     category: "uknown",
