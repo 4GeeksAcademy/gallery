@@ -9,6 +9,7 @@ const defaultImg = {
 	category: null,
 	tags: ""
 };
+
 export function Home() {
 	const [start, setStart] = useState(0);
 	const [images, setImages] = useState([]);
@@ -18,19 +19,16 @@ export function Home() {
 	const [filterCategories, setFilterCategories] = useState([]);
 	const [widgetStep, setWidgetStep] = useState(0);
 	const [pictureData, setPictureData] = useState(defaultImg);
-	useEffect(() => {
+
+	const getImages = () => {
 		fetch(process.env.ASSETS_URL + "apis/static/image/all?start=" + start)
 			.then(resp => resp.json())
 			.then(data => setImages(data))
 			.catch(err => console.error(err));
-		fetch(process.env.ASSETS_URL + "apis/static/image/categories")
-			.then(resp => resp.json())
-			.then(data => setCategories(data))
-			.catch(err => console.error(err));
-		fetch(process.env.ASSETS_URL + "apis/static/image/tags")
-			.then(resp => resp.json())
-			.then(data => setTags(data))
-			.catch(err => console.error(err));
+	}
+
+	useEffect(() => {
+
 	}, []);
 	return (
 		<div className="container">
@@ -60,159 +58,15 @@ export function Home() {
 								);
 								file.done(info => {
 									console.log("Image uploded", info);
-									setPictureData({
-										...pictureData,
-										uuid: info.uuid,
-										url: info.cdnUrl
-									});
-									fetch(
-										process.env.ASSETS_URL +
-											"apis/static/image/upload/" +
-											info.uuid,
-										{
-											method: "POST"
-										}
-									)
-										.then(resp => resp.json())
-										.catch(
-											err =>
-												console.error(err) ||
-												alert(
-													"There was an error uploading the image"
-												)
-										);
 								});
 							}
 						}}
 						onChange={info =>
-							console.log("Upload completed:", info)
+							console.log("Upload completed:", info);
+							getImages();
 						}
 					/>
-					<div>
-						<div className="row my-2">
-							<div className="col">
-								<input
-									type="text"
-									placeholder="What is this file about?"
-									className="form-control"
-									onChange={e =>
-										setPictureData({
-											...pictureData,
-											description: e.target.value
-										})
-									}
-									value={pictureData.description}
-								/>
-							</div>
-						</div>
-						<div className="row mb-2">
-							<div className="col">
-								<Select
-									placeholder="Select one categoy"
-									value={pictureData.category}
-									onChange={value =>
-										setPictureData({
-											...pictureData,
-											category: value
-										})
-									}
-									options={categories.map(cat => ({
-										value: cat,
-										label: cat
-									}))}
-								/>
-							</div>
-						</div>
-						<div className="row mb-2">
-							<div className="col">
-								<Select
-									isMulti
-									placeholder="Add some tags"
-									value={pictureData.tags}
-									onChange={values =>
-										setPictureData({
-											...pictureData,
-											tags: values
-										})
-									}
-									options={tags.map(t => ({
-										value: t,
-										label: t
-									}))}
-								/>
-							</div>
-						</div>
-						<button
-							className="btn btn-primary form-control"
-							onClick={() => {
-								fetch(
-									process.env.ASSETS_URL +
-										"apis/static/image",
-									{
-										method: "POST",
-										headers: {
-											"Content-Type": "application/json"
-										},
-										body: JSON.stringify({
-											...pictureData,
-											category:
-												pictureData.category.value,
-											tags: pictureData.tags
-												.map(t => t.value)
-												.join(",")
-										})
-									}
-								)
-									.then(resp => resp.json())
-									.then(newImg => {
-										setImages(
-											[newImg[pictureData.uuid]].concat(
-												images
-											)
-										);
-										setPictureData(defaultImg);
-										setWidgetStep(0);
-									})
-									.catch(
-										err =>
-											console.error(err) ||
-											alert(
-												"There was an error uploading the image"
-											)
-									);
-							}}>
-							Save
-						</button>
-					</div>
-				</div>
-			) : (
-				""
-			)}
-			<div className="row mb-2">
-				<div className="col-6">
-					<Select
-						isMulti
-						placeholder="Select one or more categories"
-						value={filterCategories}
-						onChange={value => setFilterCategories(value)}
-						options={categories.map(cat => ({
-							value: cat,
-							label: cat
-						}))}
-					/>
-				</div>
-				<div className="col-6">
-					<Select
-						placeholder="Select one or more tags"
-						value={filterTags}
-						onChange={value => setFilterTags(value)}
-						options={tags.map(cat => ({
-							value: cat,
-							label: cat
-						}))}
-					/>
-				</div>
-			</div>
+			) : null}
 			<div className="gallery card-columns">
 				{images
 					.filter(i => {
