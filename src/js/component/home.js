@@ -45,7 +45,7 @@ export function Home() {
 					<Widget
 						className="form-control"
 						previewStep={true}
-						publicKey={process.env.UPLOAD_CARE_PUBLIC}
+						publicKey={"84a750524a2ee4b61059"}
 						onFileSelect={file => {
 							console.log("File changed: ", file);
 
