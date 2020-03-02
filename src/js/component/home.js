@@ -61,10 +61,10 @@ export function Home() {
 								});
 							}
 						}}
-						onChange={info =>
+						onChange={info => {
 							console.log("Upload completed:", info);
 							getImages();
-						}
+						}}
 					/>
 				</div>
 			) : null}
