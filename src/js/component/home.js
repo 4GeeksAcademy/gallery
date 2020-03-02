@@ -21,7 +21,7 @@ export function Home() {
 	const [pictureData, setPictureData] = useState(defaultImg);
 
 	const getImages = () => {
-		fetch(process.env.ASSETS_URL + "apis/static/image/all?start=" + start)
+		fetch("api/get_files.js?start=" + start)
 			.then(resp => resp.json())
 			.then(data => setImages(data))
 			.catch(err => console.error(err));
