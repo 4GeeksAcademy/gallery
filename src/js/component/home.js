@@ -66,6 +66,7 @@ export function Home() {
 							getImages();
 						}
 					/>
+				</div>
 			) : null}
 			<div className="gallery card-columns">
 				{images
