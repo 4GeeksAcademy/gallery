@@ -145,8 +145,8 @@ export function Home() {
 										);
 										if (_delete)
 											fetch(
-												"api/delete.js?uuid=" +
-													img.uuid,
+												`api/delete_${apiName}.js?uuid=` +
+													img.uuid || img.Key,
 												{
 													method: "POST"
 												}

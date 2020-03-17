@@ -10,7 +10,7 @@ module.exports = (req, res) => {
                 return {
                     ...i,
                     url: "https://4geeks-academy-main.s3-us-west-2.amazonaws.com/"+i.Key,
-                    uuid: i.Etag,
+                    uuid: i.ETag.replace('"',""),
                     description: "no description",
                     category: "uknown",
                     created_at: i.LastModified

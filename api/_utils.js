@@ -20,6 +20,23 @@ const getFiles = () => new Promise((resolve, reject) => {
     });
 });
 
+const deleteFile = (key) => new Promise((resolve, reject) => {
+    var params = {
+        Bucket: bucketName, 
+        Key: key
+    };
+    s3.deleteObject(params, function(err, data) {
+        if (err){
+            console.log(err, err.stack); // an error occurred
+            reject(data);
+        } 
+        else{
+            console.log(data);           // successful response
+            resolve(data);
+        }     
+    });
+});
+
 const getUploadURL = (fileName, fileType) => new Promise((resolve, reject) => {
       // Set up the payload of what we are sending to the S3 api
     const params = {
@@ -58,4 +75,4 @@ const confirmUpload = (url) => new Promise((resolve, reject) => {
     })
 });
 
-module.exports = { getFiles, getUploadURL, confirmUpload };
+module.exports = { getFiles, getUploadURL, confirmUpload, deleteFile };
