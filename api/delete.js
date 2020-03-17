@@ -1,5 +1,5 @@
-var uploadcare = require('uploadcare')(process.env.UPLOAD_CARE_PUBLIC, process.env.UPLOAD_CARE_KEY),
-fs = require('fs');
+var uploadcare = require('uploadcare')(process.env.UPLOAD_CARE_PUBLIC, process.env.UPLOAD_CARE_KEY);
+
 module.exports = (req, res) => {
     const uuid = req.query.uuid ? req.query.uuid : null;
     const limit = req.query.limit ? req.query.limit : 100;

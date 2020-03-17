@@ -1,17 +1,17 @@
-const { confirmUpload } = require('./_utils.js');
+const { getUploadURL, getFiles } = require('./_utils.js');
 
 module.exports = (req, res) => {
-    if(!req.query.url){
+    if(!req.query.objectName || !req.query.contentType){
         res.status(400);
-        res.send(JSON.stringify({ message: "Missing url" }));
+        res.send(JSON.stringify({ message: "Missing fileName or fileType" }));
         return;
     }
 
-    const url = Buffer.from(req.query.url, 'base64').toString();
+    const fileName = req.query.objectName;
+    const fileType = req.query.contentType;
     res.setHeader('content-type', 'application/json');
-    confirmUpload(url)
+    getUploadURL(fileName, fileType)
         .then(data => {
-            console.log("Upload Success: ", data);
             res.send(JSON.stringify(data));
         })
         .catch(error => {

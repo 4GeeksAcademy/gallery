@@ -1,8 +1,9 @@
+const fetch = require('node-fetch');
 var AWS = require('aws-sdk');
 AWS.config.credentials = new AWS.Credentials({
     accessKeyId: process.env.AWS_CREDENTIAL_KEY, secretAccessKey: process.env.AWS_SECRET_CREDENTIAL_KEY
 });
-var s3 = new AWS.S3();
+var s3 = new AWS.S3({ region: 'us-west-2' });
 const bucketName = "4geeks-academy-main";
 
 const getFiles = () => new Promise((resolve, reject) => {
@@ -10,7 +11,6 @@ const getFiles = () => new Promise((resolve, reject) => {
         Bucket: bucketName, 
     };
     s3.listObjects(params, function(err, data) {
-        console.log("Result from amazon", data);
         if (err){
             reject(err);
         } 
@@ -39,9 +39,23 @@ const getUploadURL = (fileName, fileType) => new Promise((resolve, reject) => {
         resolve({
             signedRequest: data,
             signedUrl: data,
+            //signedUrl: '/api/upload_amazon.js?url='+Buffer.from(data).toString('base64'),
             url: `https://${bucketName}.s3.amazonaws.com/${fileName}`
         });
     });
 });
 
-module.exports = { getFiles, getUploadURL };
+const confirmUpload = (url) => new Promise((resolve, reject) => {
+    // Make a request to the S3 API to get a signed URL which we can use to upload our file
+  fetch(url)
+    .then(data => {
+        console.log("Uploaded: ", data.Contents);
+        resolve(data);
+    })
+    .catch(err => {
+        console.log("Error signing URL for upload ",err);
+        reject(err);
+    })
+});
+
+module.exports = { getFiles, getUploadURL, confirmUpload };

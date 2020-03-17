@@ -55,7 +55,7 @@ export function Home() {
 					<label htmlFor="file">Pick your file</label>{" "}
 					{apiName === "amazon" ? (
 						<S3Widget
-							signingUrl="/api/upload_amazon.js"
+							signingUrl="/api/get_signature_amazon.js"
 							signingUrlMethod="GET"
 							accept="image/*"
 							// preprocess={this.onUploadStart}
