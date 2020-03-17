@@ -3,7 +3,7 @@
         "ASSETS_URL": "@assets_url",
         "UPLOAD_CARE_PUBLIC": "@upload_care_public",
         "UPLOAD_CARE_KEY": "@upload_care_key",
-        "AWS_CREDENTIAL_KEY": "@aws_access_key",
+        "AWS_CREDENTIAL_KEY": "@aws_access_key_id",
         "AWS_SECRET_CREDENTIAL_KEY": "@aws_secret_access_key"
     },
     "builds": [
