@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Widget } from "@uploadcare/react-widget";
+import S3Widget from "react-s3-uploader";
 import Select from "react-select";
 //create your first component
 const defaultImg = {
@@ -12,6 +13,7 @@ const defaultImg = {
 
 export function Home() {
 	const [start, setStart] = useState(0);
+	const [apiName, setApiName] = useState("amazon");
 	const [images, setImages] = useState([]);
 	const [categories, setCategories] = useState([]);
 	const [tags, setTags] = useState([]);
@@ -20,18 +22,27 @@ export function Home() {
 	const [widgetStep, setWidgetStep] = useState(0);
 	const [pictureData, setPictureData] = useState(defaultImg);
 
-	const getImages = () => {
-		fetch("api/get_files.js?start=" + start)
+	const getImages = (_apiName, _start) => {
+		fetch(`api/get_files_${_apiName}.js?start=${_start}`)
 			.then(resp => resp.json())
 			.then(data => setImages(data))
 			.catch(err => console.error(err));
 	};
 
 	useEffect(() => {
-		getImages();
+		getImages(apiName, start);
 	}, []);
 	return (
 		<div className="container">
+			<select
+				className="form-control"
+				onChange={e => {
+					setApiName(e.target.value);
+					getImages(e.target.value, start);
+				}}>
+				<option value="amazon">Amazon</option>
+				<option value="uploadcare">Upload Care</option>
+			</select>
 			{widgetStep === 0 ? (
 				<button
 					className="btn btn-light my-2 form-control"
@@ -42,41 +53,77 @@ export function Home() {
 			) : widgetStep == 1 ? (
 				<div className="p-3 upload">
 					<label htmlFor="file">Pick your file</label>{" "}
-					<Widget
-						className="form-control"
-						previewStep={true}
-						publicKey={"84a750524a2ee4b61059"}
-						validators={[
-							fileInfo => {
-								console.log("Some validation", fileInfo);
-								if (fileInfo.size > 400000) {
-									alert("File cannot be bigger than 400kb");
-									throw new Error(
-										"File cannot be bigger than 400kb"
-									);
+					{apiName === "amazon" ? (
+						<S3Widget
+							signingUrl="/api/upload_amazon.js"
+							signingUrlMethod="GET"
+							accept="image/*"
+							// preprocess={this.onUploadStart}
+							// onSignedUrl={params => {
+							// 	console.log("onSignedUrl: ", params);
+							// }}
+							// onProgress={this.onUploadProgress}
+							onError={error => {
+								alert(error);
+								console.error("Error", error);
+							}}
+							onFinish={() => {
+								getImages(apiName, start);
+							}}
+							// signingUrlHeaders={{ additional: headers }}
+							// signingUrlQueryParams={{
+							// 	additional: query - params
+							// }}
+							// signingUrlWithCredentials={true} // in case when need to pass authentication credentials via CORS
+							uploadRequestHeaders={{
+								"x-amz-acl": "public-read"
+							}} // this is the default
+							contentDisposition="auto"
+							scrubFilename={filename =>
+								filename.replace(/[^\w\d_\-.]+/gi, "")
+							}
+							// inputRef={cmp => (this.uploadInput = cmp)}
+							autoUpload={true}
+						/>
+					) : (
+						<Widget
+							className="form-control"
+							previewStep={true}
+							publicKey={"84a750524a2ee4b61059"}
+							validators={[
+								fileInfo => {
+									console.log("Some validation", fileInfo);
+									if (fileInfo.size > 400000) {
+										alert(
+											"File cannot be bigger than 400kb"
+										);
+										throw new Error(
+											"File cannot be bigger than 400kb"
+										);
+									}
 								}
-							}
-						]}
-						onFileSelect={file => {
-							console.log("File changed: ", file);
+							]}
+							onFileSelect={file => {
+								console.log("File changed: ", file);
 
-							if (file) {
-								file.progress(info =>
-									console.log(
-										"File progress: ",
-										info.progress
-									)
-								);
-								file.done(info => {
-									console.log("Image uploded", info);
-								});
-							}
-						}}
-						onChange={info => {
-							console.log("Upload completed:", info);
-							getImages();
-						}}
-					/>
+								if (file) {
+									file.progress(info =>
+										console.log(
+											"File progress: ",
+											info.progress
+										)
+									);
+									file.done(info => {
+										console.log("Image uploded", info);
+									});
+								}
+							}}
+							onChange={info => {
+								console.log("Upload completed:", info);
+								getImages(apiName, start);
+							}}
+						/>
+					)}
 				</div>
 			) : null}
 			<div className="gallery card-columns">
